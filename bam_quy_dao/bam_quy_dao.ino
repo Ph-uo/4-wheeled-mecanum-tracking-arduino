@@ -1,4 +1,4 @@
-define
+define 
 
 double xd,yd,thetad;
 double pos[3]={x=0,y=0,theta=0};
@@ -6,12 +6,14 @@ double pos[3]={x=0,y=0,theta=0};
 
 void setup() {
   // put your setup code here, to run once:
-
+  pinMode();
+  
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-
+t=millis();
+quydao(t);
 }
 
 double quydao(t){
@@ -19,7 +21,7 @@ double quydao(t){
   xd= 1.1 + 0.7*sin(freq*t);
   yd= 0.9 + 0.7*sin(2*freq*t);
   thetad= 0; 
-  w_sp[]={motor_speed(1),motor_speed(2),motor_speed(3),motor_speed(4)};
+  w_spd[]={motor_speed(1),motor_speed(2),motor_speed(3),motor_speed(4)};
   pos[]= {}
 }
 double pid(){
