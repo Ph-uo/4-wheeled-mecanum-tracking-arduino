@@ -1,15 +1,17 @@
-define 
-define m1a 2;
-define m1b 3;
+#include <MatrixMath.h>
+//define 
+#define m1a 2
+#define m1b 3
 const byte pwm[]={9,10,11,12};
 
 double xd,yd,thetad;
-double pos[3]={x=0,y=0,theta=0};
+double x=0,y=0,theta=0;
+double pos[3]={x,y,theta};
 
 
 void setup() {
-  // put your setup code here, to run once:
-  pinMode();
+  Serial.begin(9600);
+  for(i=0;i<5;i++){pinMode(pwm[i],OUTPUT);}
   
 }
 
@@ -31,7 +33,7 @@ double pid(){// chua co bo dieu khien pid
 
 }
 void motor_control(double speed, char ena,char in1,char in2){
-  speed=constraint(speed,0,255);
+  speed=constrain(speed,0,255);
   analogwrite(ena,speed);
   if (speed>0){
     digitalwrite(in1,1);
@@ -45,7 +47,7 @@ void motor_control(double speed, char ena,char in1,char in2){
     digitalwrite(in2,0);
   }
 }
-double calc_spd(int count){//tinh toan toc do cua 1 dong co
+double motor_speed(int counta){//tinh toan toc do cua 1 dong co
   double theta= count/(13*19.2);
   double speed_now= theta*t*60/1000;//m/s
   return speed_now;
