@@ -28,19 +28,40 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-t=millis();
-quydao(t);
+
+quydao();
+}
+double motor_speed(unsigned long count){//ham tinh toan toc do cua 1 dong co; input =xung encoder, output= toc do (m/s) va chieu quay
+  double theta= count/(13*19.2);
+  double speed_now= theta*t*60/1000;//m/s
+  //if(){//xet chieu quay, chua co ham
+    
+  //}
+  return speed_now;
 }
 
-double quydao(t){//tinh toan quy dao chua xong
-  freq = 2*pi/30;
-  xd= 1.1 + 0.7*sin(freq*t);
-  yd= 0.9 + 0.7*sin(2*freq*t);
-  thetad= 0; 
+void quydao(){//tinh toan quy dao chua xong
+  t=millis();
+  //quỹ đạo đặt
+  float freq = 2*3.14/30;
+  float xd= 1.1 + 0.7*sin(freq*t);
+  float yd= 0.9 + 0.7*sin(2*freq*t);
+  float thetad= 0; 
+  //tính toán quỹ đạo thực
   //1,2,3,4 là tượng trưng cho tốc độ dc1,dc2,..., thay bằng biến đếm xung của các động cơ tương ứng
-  w_spd[1][4]={motor_speed(1),motor_speed(2),motor_speed(3),motor_speed(4)};
+  double w_spd[1][4]={motor_speed(1),motor_speed(2),motor_speed(3),motor_speed(4)};
   double result[3][1]={};
-  internal_mobile_spd= Matrix.Mutiply(w_spd,fw_kinematic,1,4,3,result)/4;
+  Matrix.Multiply(&w_spd[0][0],&fw_kinematic[0][0],1,4,3,&result[0][0]);
+  // tính tốc độ thực của robot trong hệ tọa độ internal
+  double internal_mobile_spd[3][1];
+  for (int i = 0; i < 3; i++) {
+      internal_mobile_spd[i][0] = result[i][0] / 4;
+  }
+  //tốc độ thực của robot trong hệ global
+  double global_mobile_spd [3][1];
+  Matrix.Multiply(&internal_mobile_spd[0][0],&Rot[0][0],3,1,3,&global_mobile_spd[0][0]);
+  //quỹ đạo thực tế
+  
 }
 double pid(){// chua co bo dieu khien pid
 
@@ -55,19 +76,20 @@ void motor_control(double speed, char ena,char in1,char in2){
   else if (speed>0){
     digitalWrite(in1,1);
     digitalWrite(in2,0);
+  }
   else {
     digitalWrite(in1,0);
     digitalWrite(in2,0);
   }
 }
-double motor_speed(unsigned long count){//ham tinh toan toc do cua 1 dong co; input =xung encoder, output= toc do (m/s) va chieu quay
+/*double motor_speed(unsigned long count){//ham tinh toan toc do cua 1 dong co; input =xung encoder, output= toc do (m/s) va chieu quay
   double theta= count/(13*19.2);
   double speed_now= theta*t*60/1000;//m/s
-  if(){//xet chieu quay, chua co ham
+  //if(){//xet chieu quay, chua co ham
     
-  }
+  //}
   return speed_now;
-}
+}*/
 
 // thiet ke lai bo dem xung, chua khai bao bien
 /*
