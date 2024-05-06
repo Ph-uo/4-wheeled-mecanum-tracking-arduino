@@ -6,13 +6,14 @@ const byte pwm[]={9,10,11,12};
 //coordinate - tọa độ
 double xd,yd,thetad;
 double x=0,y=0,theta=0;
-double pos[3]={x,y,theta};
-//robot properties - thông số xe
-double l=0.2, d=0.2;
+//robot properties(m) - thông số xe(m)
+double l=0.2, d=0.2,r=0.15;
 
 
-//others - khác
+//others varaible  - các thông số khác
 unsigned long t,t_prv=0;
+float error,error_prev, freq = 2*3.14/30;
+float integr,derivate;
 
 //matrix - ma trận-------------note: kiểm tra xem ngăn nhớ của mạch có thể xử lý được từng này dữ liệu double không
 double fw_kinematic[3][4]={{1,1,1,1},{-1,1,-1,1},{-1/(l+d),-1/(l+d),1/(l+d),1/(l+d)}};//dong hoc thuan
@@ -43,15 +44,14 @@ double motor_speed(unsigned long count){//ham tinh toan toc do cua 1 dong co; in
 void quydao(){//tinh toan quy dao chua xong
   t=millis();
   //quỹ đạo đặt
-  float freq = 2*3.14/30;
-  float xd= 1.1 + 0.7*sin(freq*t);
-  float yd= 0.9 + 0.7*sin(2*freq*t);
-  float thetad= 0; 
+  xd= 1.1 + 0.7*sin(freq*t);
+  yd= 0.9 + 0.7*sin(2*freq*t);
+  thetad= 0; 
   //tính toán quỹ đạo thực
   //1,2,3,4 là tượng trưng cho tốc độ dc1,dc2,..., thay bằng biến đếm xung của các động cơ tương ứng
-  double w_spd[1][4]={motor_speed(1),motor_speed(2),motor_speed(3),motor_speed(4)};
+  double w_spd[4][1]={{motor_speed(1)},{motor_speed(2)},{motor_speed(3)},{motor_speed(4)}};
   double result[3][1]={};
-  Matrix.Multiply(&w_spd[0][0],&fw_kinematic[0][0],1,4,3,&result[0][0]);
+  Matrix.Multiply(&w_spd[0][0],&fw_kinematic[0][0],4,1,3,&result[0][0]);
   // tính tốc độ thực của robot trong hệ tọa độ internal
   double internal_mobile_spd[3][1];
   for (int i = 0; i < 3; i++) {
@@ -61,10 +61,18 @@ void quydao(){//tinh toan quy dao chua xong
   double global_mobile_spd [3][1];
   Matrix.Multiply(&internal_mobile_spd[0][0],&Rot[0][0],3,1,3,&global_mobile_spd[0][0]);
   //quỹ đạo thực tế
-  
+  x=x+global_mobile_spd[0][0];
+  y=y+global_mobile_spd[1][0];
+  theta=theta+global_mobile_spd[2][0];
 }
-double pid(){// chua co bo dieu khien pid
-
+double pid(float setpoint, float input, float kp, float ki, float kd){//chưa xong
+  double pid,dt;// chưa có dt
+  error = setpoint-input;
+  integr += (dt * (error + error_prev) / 2);
+  derivate= (error - error_prev) / dt;
+  pid = kp*error + ki*integr + kd*derivate ;
+  error_prev = error;
+  return pid;
 }
 void motor_control(double speed, char ena,char in1,char in2){
   speed=constrain(speed,0,255);//hàm giới hạn
@@ -96,25 +104,17 @@ void motor_control(double speed, char ena,char in1,char in2){
 void countpulse1a(){
   unsigned long count1a++;
 }
-void countpulse1b(){
-  count1b++;
-}
+
 void countpulse2a(){
-  count2a++;
+  unsigned long count2a++;
 }
-void countpulse2b(){
-  count2b++;
-}
+
 void countpulse3a(){
-  count3a++;
+  unsigned long count3a++;
 }
-void countpulse3b(){
-  count3b++;
-}
+
 void countpulse4a(){
-  count4a++;
+  unsigned long count4a++;
 }
-void countpulse4b(){
-  count4b++;
-}
+
 */
