@@ -1,14 +1,16 @@
 #include <MatrixMath.h>
 //define - khai báo
-#define m1a 2
-#define m1b 3
+
 const byte pwm[]={9,10,11,12};
+const byte ina[]={3,4,5,6};
+const byte inb[]={22,23,24,25};
+const byte encdA []={13,14,15,16};
+const byte encdB []={17,18,19,20};
 //coordinate - tọa độ
 double xd,yd,thetad;
 double x=0,y=0,theta=0;
 //robot properties(m) - thông số xe(m)
 double l=0.2, d=0.2,r=0.15;
-
 
 //others varaible  - các thông số khác
 unsigned long t,t_prv=0;
@@ -22,9 +24,20 @@ double Rot[3][3]={{cos(theta),sin(theta),0},{-sin(theta),cos(theta),0},{0,0,1}};
 
 void setup() {
   Serial.begin(9600);
-  for(int i=0;i<5;i++){pinMode(pwm[i],OUTPUT);}
-  
-    
+  for(int i=0;i<5;i++){
+    pinMode(pwm[i],OUTPUT);
+    pinMode(ina[i],OUTPUT);
+    pinMode(inb[i],OUTPUT);
+    pinMode(encdA,inputpullup);
+    pinMode(encdB,inputpullup);
+    }
+  attachinterupt(pintointerupt(encdA[0]),countpulse1(),RISING);
+
+  attachinterupt(pintointerupt(encdA[1]),countpulse2(),RISING);
+
+  attachinterupt(pintointerupt(encdA[2]),countpulse3(),RISING);
+
+  attachinterupt(pintointerupt(encdA[3]),countpulse4(),RISING);
 }
 
 void loop() {
@@ -93,9 +106,9 @@ void motor_control(double speed, char ena,char in1,char in2){
 /*double motor_speed(unsigned long count){//ham tinh toan toc do cua 1 dong co; input =xung encoder, output= toc do (m/s) va chieu quay
   double theta= count/(13*19.2);
   double speed_now= theta*t*60/1000;//m/s
-  //if(){//xet chieu quay, chua co ham
+  if(){//xet chieu quay, chua co ham
     
-  //}
+  }
   return speed_now;
 }*/
 
