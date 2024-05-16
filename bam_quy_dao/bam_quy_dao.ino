@@ -89,7 +89,7 @@ double pid(float setpoint, float input, float kp, float ki, float kd){//chưa xo
 }
 void motor_control(double speed, char ena,char in1,char in2){
   speed=constrain(speed,0,255);//hàm giới hạn
-  analogWrite(ena,speed);
+  
   if (speed>0){
     digitalWrite(in1,1);
     digitalWrite(in2,0);
@@ -102,6 +102,7 @@ void motor_control(double speed, char ena,char in1,char in2){
     digitalWrite(in1,0);
     digitalWrite(in2,0);
   }
+  analogWrite(ena,abs(speed));
 }
 /*double motor_speed(unsigned long count){//ham tinh toan toc do cua 1 dong co; input =xung encoder, output= toc do (m/s) va chieu quay
   double theta= count/(13*19.2);
