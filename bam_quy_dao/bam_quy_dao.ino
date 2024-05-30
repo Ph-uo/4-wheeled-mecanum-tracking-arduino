@@ -1,11 +1,13 @@
 #include <MatrixMath.h>
+#include <Encoder.h>
 //define - khai báo
 
 const byte pwm[]={9,10,11,12};
 const byte ina[]={3,4,5,6};
 const byte inb[]={22,23,24,25};
-const byte encdA []={13,14,15,16};
-const byte encdB []={17,18,19,20};
+volatile long encdA []={13,14,15,16};
+volatile long encdB []={17,18,19,20};
+
 //coordinate - tọa độ
 double xd,yd,thetad;
 double x=0,y=0,theta=0;
@@ -16,6 +18,7 @@ double l=0.2, d=0.2,r=0.15;
 unsigned long t,t_prv=0;
 float error,error_prev, freq = 2*3.14/30;
 float integr,derivate;
+int dt;
 
 //matrix - ma trận-------------note: kiểm tra xem ngăn nhớ của mạch có thể xử lý được từng này dữ liệu double không
 double fw_kinematic[3][4]={{1,1,1,1},{-1,1,-1,1},{-1/(l+d),-1/(l+d),1/(l+d),1/(l+d)}};//dong hoc thuan
@@ -28,22 +31,34 @@ void setup() {
     pinMode(pwm[i],OUTPUT);
     pinMode(ina[i],OUTPUT);
     pinMode(inb[i],OUTPUT);
-    pinMode(encdA,inputpullup);
-    pinMode(encdB,inputpullup);
+    // pinMode(encdA,inputpullup);
+    // pinMode(encdB,inputpullup);
+
     }
-  attachinterupt(pintointerupt(encdA[0]),countpulse1(),RISING);
+  /*attachinterupt(pintointerupt(encdA[0]),countpulse1(),RISING);
 
   attachinterupt(pintointerupt(encdA[1]),countpulse2(),RISING);
 
   attachinterupt(pintointerupt(encdA[2]),countpulse3(),RISING);
 
-  attachinterupt(pintointerupt(encdA[3]),countpulse4(),RISING);
+  attachinterupt(pintointerupt(encdA[3]),countpulse4(),RISING);*/
+
+
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  t=millis();
+  dt=t-t_prev;
+  if (dt>=50){
+  quydao();
+  
+  }
+  pwm1=pid(pwm1a,)
+  motor_control(pwm1,pwm[0],ina[0],inb[0]);
+  motor_control(pwm2,pwm[1],ina[1],inb[1]);
+  motor_control(pwm3,pwm[2],ina[2],inb[2]);
+  motor_control(pwm4,pwm[3],ina[3],inb[3]);
 
-quydao();
 }
 double motor_speed(unsigned long count){//ham tinh toan toc do cua 1 dong co; input =xung encoder, output= toc do (m/s) va chieu quay
   double theta= count/(13*19.2);
@@ -55,7 +70,6 @@ double motor_speed(unsigned long count){//ham tinh toan toc do cua 1 dong co; in
 }
 
 void quydao(){//tinh toan quy dao chua xong
-  t=millis();
   //quỹ đạo đặt
   xd= 1.1 + 0.7*sin(freq*t);
   yd= 0.9 + 0.7*sin(2*freq*t);
@@ -79,17 +93,19 @@ void quydao(){//tinh toan quy dao chua xong
   theta=theta+global_mobile_spd[2][0];
 }
 double pid(float setpoint, float input, float kp, float ki, float kd){//chưa xong
-  double pid,dt;// chưa có dt
+  double pid_result;// chưa có dt
   error = setpoint-input;
   integr += (dt * (error + error_prev) / 2);
   derivate= (error - error_prev) / dt;
-  pid = kp*error + ki*integr + kd*derivate ;
+  pid_result = kp*error + ki*integr + kd*derivate ;
   error_prev = error;
-  return pid;
+  return pid_result;
 }
+
+
 void motor_control(double speed, char ena,char in1,char in2){
   speed=constrain(speed,0,255);//hàm giới hạn
-  
+  analogWrite(ena,speed);
   if (speed>0){
     digitalWrite(in1,1);
     digitalWrite(in2,0);
@@ -102,33 +118,12 @@ void motor_control(double speed, char ena,char in1,char in2){
     digitalWrite(in1,0);
     digitalWrite(in2,0);
   }
-  analogWrite(ena,abs(speed));
 }
-/*double motor_speed(unsigned long count){//ham tinh toan toc do cua 1 dong co; input =xung encoder, output= toc do (m/s) va chieu quay
+double motor_speed(unsigned long count){//ham tinh toan toc do cua 1 dong co; input =xung encoder, output= toc do (m/s) va chieu quay
   double theta= count/(13*19.2);
-  double speed_now= theta*t*60/1000;//m/s
+  double speed_now= theta*r*1000/dt;//m/s
   if(){//xet chieu quay, chua co ham
     
   }
   return speed_now;
-}*/
-
-// thiet ke lai bo dem xung, chua khai bao bien
-/*
-void countpulse1a(){
-  unsigned long count1a++;
 }
-
-void countpulse2a(){
-  unsigned long count2a++;
-}
-
-void countpulse3a(){
-  unsigned long count3a++;
-}
-
-void countpulse4a(){
-  unsigned long count4a++;
-}
-
-*/
