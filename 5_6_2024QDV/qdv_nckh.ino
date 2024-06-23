@@ -9,9 +9,9 @@ const float L = 1.0;
 const float R = 1.0;
 const float vertices[5][2] = { {1, -1}, {L, R}, {-1, R}, {-1, -1}, {1, -1} }; // Đỉnh của hình chữ nhật
 
-float kp_ex = 0.2, ki_ex = 0.001, kd_ex = -0.001;
-float kp_ey = 0.2, ki_ey = 0.001, kd_ey = -0.001;
-float kp_eth = 0.08, ki_eth = 0.002, kd_eth = 0.001;
+float kp_ex = 0.2, ki_ex = 0.003, kd_ex = -0.001;
+float kp_ey = 0.2, ki_ey = 0.003, kd_ey = -0.001;
+float kp_eth = 0.05, ki_eth = 0.001, kd_eth = -0.001;
 float error_ex, error_prevex = 0, integ_ex, integ_prevex = 0;
 float error_ey, error_prevey = 0, integ_ey, integ_prevey = 0;
 float error_eth, error_preveth = 0, integ_eth, integ_preveth = 0;
@@ -27,7 +27,7 @@ float theta_now3 = 0, theta_prev3 = 0;
 float theta_now4 = 0, theta_prev4 = 0;
 
 float xd_dot, yd_dot, xd = 1, yd = -1,thetad=0;
-float heso = 0.2, r = 0.075;
+float heso = 0.15, r = 0.075;
 float vx = 0, vy = 0, ex = 0, ey = 0,eth=0;
 //float x = 0, y = 0;
 float x = 1, y = -1;
@@ -85,7 +85,7 @@ void my_HN4() {
   encoderCount4 = myEncoder4.read();
 }
 
-void quydao_HV(float &xd_dot, float &yd_dot, float &xd, float &yd) {
+void quydao_HV() {
   if (x_cam == 0.00 && y_cam == 0.00) {
     t = 0;
     xd = 0;
@@ -110,8 +110,7 @@ void quydao_HV(float &xd_dot, float &yd_dot, float &xd, float &yd) {
 
   ex = xd - x_cam;
   ey = yd - y_cam;
-  if (th_cam>0){  eth = thetad-th_cam;}
-  else{ eth =-thetad+th_cam;}//th_cam<=0
+  eth = thetad-th_cam;
 
   error_ex = ex;
   integ_ex = integ_prevex + (dt * (error_ex + error_prevex) / 2);
@@ -139,10 +138,10 @@ void quydao_HV(float &xd_dot, float &yd_dot, float &xd, float &yd) {
   vy1 = (-sin(th_cam) * vxa) + (cos(th_cam)) * vya;
 
   a = lx + ly;
-  Ui1 = ((1 / r) * vx1) + ((-1 / r) * vy1) + ((-a / r) * w1);
-  Ui2 = ((1 / r) * vx1) + ((1 / r) * vy1) + ((a / r) * w1);
-  Ui3 = ((1 / r) * vx1) + ((1 / r) * vy1) + ((-a / r) * w1);
-  Ui4 = ((1 / r) * vx1) + ((-1 / r) * vy1) + ((a / r) * w1);
+  Ui1 = (1 / r) *( vx1 - vy1 + (-a * w1));
+  Ui2 = (1 / r) *( vx1 + vy1 + ( a * w1));
+  Ui3 = (1 / r) *( vx1 + vy1 + (-a * w1));
+  Ui4 = (1 / r) *( vx1 - vy1 + ( a * w1));
   
   t += dt1;
 }
@@ -207,7 +206,7 @@ void loop() {
   } 
   else {
     // Nếu không, tiếp tục tính toán và điều khiển
-    quydao_HV(xd_dot, yd_dot, xd, yd);
+    quydao_HV();
     PID1();
     PID2();
     PID3();
