@@ -9,9 +9,9 @@ const float L = 1.0;
 const float R = 1.0;
 const float vertices[5][2] = { {1, -1}, {L, R}, {-1, R}, {-1, -1}, {1, -1} }; // Đỉnh của hình chữ nhật
 
-float kp_ex = 0.2, ki_ex = 0.003, kd_ex = -0.001;
-float kp_ey = 0.2, ki_ey = 0.003, kd_ey = -0.001;
-float kp_eth = 0.05, ki_eth = 0.001, kd_eth = -0.001;
+float kp_ex = 0.5, ki_ex = 0.003, kd_ex = -0.001;
+float kp_ey = 0.5, ki_ey = 0.003, kd_ey = -0.001;
+float kp_eth = 0.1, ki_eth = 0.0005, kd_eth = -0.001;
 float error_ex, error_prevex = 0, integ_ex, integ_prevex = 0;
 float error_ey, error_prevey = 0, integ_ey, integ_prevey = 0;
 float error_eth, error_preveth = 0, integ_eth, integ_preveth = 0;
